@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Meu Site Simples</title>
+  <title>Meu Site de Carros</title>
   <style>
     body {
       margin: 0;
@@ -22,6 +22,7 @@
       background-color: #444;
       display: flex;
       justify-content: center;
+      flex-wrap: wrap;
     }
 
     nav a {
@@ -40,6 +41,32 @@
       max-width: 1000px;
       margin: auto;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .filtro {
+      margin-bottom: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .filtro input,
+    .filtro select,
+    .filtro button {
+      padding: 0.5rem;
+      font-size: 1rem;
+    }
+
+    .carro {
+      margin-bottom: 2rem;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 1rem;
+    }
+
+    .carro img {
+      max-width: 100%;
+      height: auto;
     }
 
     footer {
@@ -61,50 +88,100 @@
       }
     }
   </style>
+  <script>
+    function filtrarCarros() {
+      const busca = document.getElementById('busca').value.toLowerCase();
+      const categoria = document.getElementById('categoria').value;
+      const preco = document.getElementById('preco').value;
+      const carros = Array.from(document.querySelectorAll('.carro'));
+
+      carros.forEach(carro => {
+        const texto = carro.innerText.toLowerCase();
+        const exibeCategoria = categoria === "todas" || carro.classList.contains(categoria);
+
+        let exibePreco = true;
+        const precoTexto = carro.innerText.toLowerCase().match(/r\$\s?([\d\.]+)/);
+        if (precoTexto) {
+          const valor = parseFloat(precoTexto[1].replace('.', '').replace(',', '.'));
+          if (preco === "ate50" && valor > 50000) exibePreco = false;
+          if (preco === "50a100" && (valor < 50000 || valor > 100000)) exibePreco = false;
+          if (preco === "100a200" && (valor < 100000 || valor > 200000)) exibePreco = false;
+          if (preco === "acima200" && valor < 200000) exibePreco = false;
+        }
+
+        carro.style.display = texto.includes(busca) && exibeCategoria && exibePreco ? 'block' : 'none';
+      });
+    }
+
+    function ordenarPorPreco(crescente = true) {
+      const carrosContainer = document.querySelector('main');
+      const carros = Array.from(document.querySelectorAll('.carro'));
+      carros.sort((a, b) => {
+        const precoA = parseFloat(a.innerText.match(/R\$\s?([\d\.]+)/)[1].replace('.', '').replace(',', '.'));
+        const precoB = parseFloat(b.innerText.match(/R\$\s?([\d\.]+)/)[1].replace('.', '').replace(',', '.'));
+        return crescente ? precoA - precoB : precoB - precoA;
+      });
+      carros.forEach(carro => carrosContainer.appendChild(carro));
+    }
+  </script>
 </head>
 <body>
 
   <header>
-    <h1>Bem-vindo ao Meu Site</h1>
-    <p>Um site simples em HTML e CSS</p>
+    <h1>Concessionária AutoTop</h1>
+    <p>Os melhores carros com os melhores preços</p>
   </header>
 
   <nav>
-    <a href="#home">Início</a>
-    <a href="#sobre">Sobre</a>
-    <a href="#servicos">Serviços</a>
+    <a href="#inicio">Início</a>
+    <a href="#carros">Carros</a>
+    <a href="#suvs">SUVs</a>
+    <a href="#eletricos">Elétricos</a>
+    <a href="#usados">Usados</a>
+    <a href="#luxo">Luxo</a>
+    <a href="#esportivos">Esportivos</a>
     <a href="#contato">Contato</a>
   </nav>
 
   <main>
-    <section id="home">
-      <h2>Início</h2>
-      <p>Este é o conteúdo da página inicial. Você pode modificar e expandir como quiser.</p>
+    <section class="filtro">
+      <label for="busca">Buscar carro:</label>
+      <input type="text" id="busca" onkeyup="filtrarCarros()" placeholder="Digite nome, marca ou valor...">
+
+      <label for="categoria">Categoria:</label>
+      <select id="categoria" onchange="filtrarCarros()">
+        <option value="todas">Todas</option>
+        <option value="suv">SUVs</option>
+        <option value="eletrico">Elétricos</option>
+        <option value="usado">Usados</option>
+        <option value="luxo">Luxo</option>
+        <option value="esportivo">Esportivos</option>
+      </select>
+
+      <label for="preco">Faixa de Preço:</label>
+      <select id="preco" onchange="filtrarCarros()">
+        <option value="todas">Todas</option>
+        <option value="ate50">Até R$ 50.000</option>
+        <option value="50a100">R$ 50.000 a R$ 100.000</option>
+        <option value="100a200">R$ 100.000 a R$ 200.000</option>
+        <option value="acima200">Acima de R$ 200.000</option>
+      </select>
+
+      <button onclick="ordenarPorPreco(true)">Ordenar Preço ↑</button>
+      <button onclick="ordenarPorPreco(false)">Ordenar Preço ↓</button>
     </section>
 
-    <section id="sobre">
-      <h2>Sobre Nós</h2>
-      <p>Somos uma empresa dedicada a criar sites incríveis e responsivos.</p>
-    </section>
-
-    <section id="servicos">
-      <h2>Serviços</h2>
-      <ul>
-        <li>Criação de Sites</li>
-        <li>Design Responsivo</li>
-        <li>Consultoria Web</li>
-      </ul>
-    </section>
+    <!-- Carros aqui -->
 
     <section id="contato">
       <h2>Contato</h2>
-      <p>Email: contato@exemplo.com</p>
-      <p>Telefone: (11) 99999-9999</p>
+      <p>Email: vendas@autotop.com.br</p>
+      <p>Telefone: (11) 98888-7777</p>
     </section>
   </main>
 
   <footer>
-    <p>&copy; 2025 Meu Site. Todos os direitos reservados.</p>
+    <p>&copy; 2025 AutoTop. Todos os direitos reservados.</p>
   </footer>
 
 </body>
